@@ -4,10 +4,22 @@ from django.db import models
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="First Name",
+        help_text="Enter the first name",
+    )
+    slug = models.SlugField(unique=True, editable=False)
     is_active = models.BooleanField(default=False)
-    parent = models.ForeignKey("self", on_delete=models.PROTECT)
+    parent = models.ForeignKey("self", on_delete=models.PROTECT, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Iventory Category"
+        verbose_name_plural = "Iventory Categories"
+
+    def __str__(self):
+        return self.name
 
 
 class SeasonalEvents(models.Model):
@@ -54,8 +66,9 @@ class Product(models.Model):
 
 
 class Attribute(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
     description = models.TextField(null=True)
+    text = models.CharField(max_length=100, default="text", null=True)
 
 
 class AttributeValue(models.Model):
@@ -64,15 +77,15 @@ class AttributeValue(models.Model):
 
 
 class ProductLine(models.Model):
-    price = models.DecimalField()
+    price = models.DecimalField(decimal_places=2, max_digits=10)
     sku = models.UUIDField(default=uuid.uuid4)
     stock_qty = models.IntegerField(default=0)
     is_active = models.BooleanField(default=False)
     order = models.IntegerField()
     weight = models.FloatField()
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    attribute_value = models.ManyToManyField(
-        AttributeValue, related_name="attribute_value"
+    attribute_values = models.ManyToManyField(
+        AttributeValue, related_name="attribute_values"
     )
 
 
